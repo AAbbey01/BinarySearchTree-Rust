@@ -1,4 +1,5 @@
 #![recursion_limit = "131072"]
+#![allow(non_snake_case)]
 //TODO: Add LR actual function to print
 use std::io;
 //Node Stuff
@@ -15,7 +16,7 @@ impl Node{
 /**impl Default for Node {
     fn default() -> Node{
     Node {
-        val: -1,
+        val: -1,S
     }
     }
     }*/
@@ -29,11 +30,11 @@ struct BinTree{
 }
 impl BinTree{
     
-    fn find(&self, key: i64){
-        print!("{} is the current root\n", self.root.val);
+    fn find(&self, key: i64) -> bool{
+        //print!("{} is the current root\n", self.root.val);
         if self.root.val == key{
-            print!("Found {key} in tree");
-            return;
+            
+            return true;
         }else{
             if self.left.is_some(){
                 if self.root.val > key{
@@ -44,7 +45,7 @@ impl BinTree{
                 }
             }
         }
-        print!("Didn't Find {key} in tree");
+        return false;
     }
     fn add_node(&mut self, node: Node){
         //print!("Adding to {}\n",self.root.val);
@@ -111,6 +112,12 @@ impl BinTree{
             }
         }
     }
+    ///Must Keep Track of: 
+    fn delete( &mut self, node:Node){
+        if !self.find(node.val){
+            print!("Value not in tree");
+            return;};
+    }
 }
 #[warn(unconditional_recursion)]
 impl Default for BinTree{
@@ -123,13 +130,13 @@ fn main(){
     //n.print();
     let mut b_t = BinTree{..Default::default()};
     loop{
-        print!("Functions (Type the Letter for Each)\nA: Add a Key to the Tree (Until -1 is inputted)\nF: Find if a Key is in the Tree\nD: Delete A Key in the Tree\nP: Print Tree\nE: Exit\n");
+        print!("Functions (Type the Letter for Each)\nA: Add a Key to the Tree (Until -1 is inputted)\nF: Find if a Key is in the Tree\nD: Delete A Key in the Tree\nP: Print Tree\nE: Exit (Ctrl+C to Force Stop)\n");
         let mut power_input = String::new();
             io::stdin()
                 .read_line(&mut power_input)
                 .expect("Failed to read line");
         match power_input.trim() {
-            "A" =>  a(&mut b_t),
+            "A" =>  add_node_public(&mut b_t),
             "F" => {
                 println!("Please enter the key you want to find:");
                 let mut ing = String::new();
@@ -144,7 +151,11 @@ fn main(){
                         continue;
                     }
                 };
-                b_t.find(key);
+                if b_t.find(key) {
+                    print!("{key} found in tree\n");
+                }else{
+                    print!("{key} not in tree\n");
+                }
             },
             "D" => {
                 print!("Delete Not Implemented Yet\n");
@@ -159,9 +170,8 @@ fn main(){
         
 }
 }
-
-
-fn a(n: &mut BinTree){
+ 
+fn add_node_public(n: &mut BinTree){
     let mut numbers = Vec::new();
     println!("Enter integers (enter -1 to exit):");
     loop {
@@ -177,19 +187,12 @@ fn a(n: &mut BinTree){
                 continue;
             }
         };
-
         if num == -1 {
             break;
         }
-
         numbers.push(num);
     }
-
-    //println!("Numbers entered:");
     for num in numbers {
-        //println!("{}", num);
         n.add_node(Node{val: num});
     }
-    //n.print();
-
 }
