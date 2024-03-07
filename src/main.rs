@@ -19,14 +19,16 @@
 //! 🦀⚠️
 #![recursion_limit = "131072"]
 #![allow(non_snake_case)]
+use core::num;
 //TODO: Add LR actual function to print
 use std::io;
 
 use BinaryTree::BinTree;
 //Node Stuff
-
+const COUNT: i64 = 5;
 pub mod Nodes{
-pub struct Node{
+#[derive(Debug,Clone)]
+    pub struct Node{
     pub(crate) val: i64,
 }
 impl Node{
@@ -38,8 +40,11 @@ impl Node{
 }
 //Binary Tree Stuff
 pub mod BinaryTree{
-    use crate::Nodes;
+    
 
+
+    use crate::Nodes;
+#[derive(Debug, Clone)]
 pub struct BinTree{
     pub(crate) root: crate::Nodes::Node,
     pub(crate) left: Option<Box<BinTree>>,
@@ -50,20 +55,21 @@ impl BinTree{
     
     pub fn find(&self, key: i64) -> bool{
         //print!("{} is the current root\n", self.root.val);
+        let mut b = false;
         if self.root.val == key{
-            
+            //println!("Found {key}");
             return true;
         }else{
-            if self.left.is_some(){
-                if self.root.val > key{
-                unsafe{let _ = &self.left.as_ref().unwrap_unchecked().find(key);
-                }
+            if self.root.val > key{
+                if self.left.is_some(){   
+                    //println!("{key} too small, going left");         
+                    unsafe{b = self.left.as_ref().unwrap_unchecked().find(key);}
             }}else if self.right.is_some(){
-                unsafe{let _ = &self.right.as_ref().unwrap_unchecked().find(key);
-                }
+                //println!("{key} too big, going right");
+                unsafe{b = self.right.as_ref().unwrap_unchecked().find(key);}
             }
         }
-        return false;
+        return b;
     }
     pub fn add_node(&mut self, node: crate::Nodes::Node){
         //print!("Adding to {}\n",self.root.val);
@@ -88,27 +94,49 @@ impl BinTree{
             }
         }
     }
-    pub fn print(&self){
-        if self.root.val == -1 {return;}
-        //unsafe { self.left.as_ref().unwrap_unchecked().print() };
-        //unsafe { self.right.as_ref().unwrap_unchecked().print() };
-        if self.left.is_some(){
-            //if unsafe{&self.left.as_ref().unwrap_unchecked().left}.is_none(){
-                print!("    ");
-                unsafe{let _ = &self.left.as_ref().unwrap_unchecked().print();}
-            //}
-            
-        }
+    
+    /*{
+    // Base case
 
+// Increase distance between levels
+space += COUNT;
+
+// Process right child first
+print2DUtil(root->right, space);
+
+// Print current node after space
+// count
+cout << endl;
+for (int i = COUNT; i < space; i++)
+    cout << " ";
+cout << root->data << "\n";
+
+// Process left child
+print2DUtil(root->left, space);
+} */
+    
+    pub fn print(&self, spacing: i64 ){
+        let space = spacing + crate::COUNT;
+        if self.root.val == -1 {return;}
+        if self.left.is_some(){
+            unsafe{self.left.as_ref().unwrap_unchecked().print(space);}
+        }
+        for n in crate::COUNT..=space{
+            print!(" ");
+        }
         self.root.print();
         if self.right.is_some(){
-            //if !unsafe{&self.right.as_ref().unwrap_unchecked().right}.is_none(){
-                print!("    ");
-                unsafe{let _ = &self.right.as_ref().unwrap_unchecked().print();}
-            //}
             
+            unsafe{self.right.as_ref().unwrap_unchecked().print(space);}
         }
+    
     }
+
+
+
+
+
+
     fn add_next(&mut self, node: Nodes::Node){
         if node.val == -1 {return;}
         if self.root.val == -1 {
@@ -137,9 +165,38 @@ impl BinTree{
             println!("Value not in tree");
             return;};
         //get here if the value is in, then get to the node and check if it has children.
+        if node != self.root.val{
+            let mut b = self.foo(node);
+            if b.root.val == -1{
+                println!("error in finding node in tree");
+                return;
+            }
+            let mut a = 0;
+            if b.left.is_some(){a+=1};
+            if b.right.is_some(){a+=1};
+            b.print(0);
+            println!("{a}");
+
+        }else{
+            //if key to delete = root value
+        }
         
     }
-    
+  
+    fn foo(&mut self, key: i64) -> BinTree{
+        let mut b = BinTree{..Default::default()};
+        if self.root.val == key{
+            return self.to_owned();
+        }
+        if self.root.val > key{
+            //self.left.foo(key);
+            unsafe{b = self.left.as_mut().unwrap_unchecked().foo(key);}
+        }
+        if self.root.val < key{
+            unsafe{b = self.right.as_mut().unwrap_unchecked().foo(key);}
+        }
+        return b;
+    }
 }
 #[warn(unconditional_recursion)]
 impl Default for BinTree{
@@ -148,6 +205,7 @@ impl Default for BinTree{
     }
 }
 }
+
 fn main(){
     //n.print();
     let mut b_t = BinaryTree::BinTree{..Default::default()};
@@ -205,7 +263,8 @@ fn main(){
         
 }
 }
- 
+  
+
 fn add_node_public(n: &mut BinTree){
     let mut numbers = Vec::new();
     println!("Enter integers (enter -1 to exit):");
@@ -230,4 +289,4 @@ fn add_node_public(n: &mut BinTree){
     for num in numbers {
         n.add_node(Nodes::Node{val: num});
     }
-}
+} 
