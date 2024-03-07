@@ -1,9 +1,31 @@
+//! Sample Stuff for the Crate Stuff
+//! ## Detailed Introduction
+//! This is a detailed intro to this libraray
+//! - [x] This Crate builds a fully operational binary search tree
+//! - [x] When run normally, users will be prompted to what they want to do with a tree
+//! - Users will be able to use functions such as:
+//!  - [x] adding nodes to a tree
+//!  - [ ] deleting nodes
+//!  - [x] finding a node in the tree
+//!  - [x] displaying the tree
+//! Example:
+//! ```
+//! let mut tree = BinTree{..Default::default()};
+//! tree.add_node(Node{val:14});
+//! tree.add_node(Node{val:15});
+//! tree.add_node(Node{val:13});
+//! tree.print();
+//! ```
+//! 🦀⚠️
+
 #![recursion_limit = "131072"]
 #![allow(non_snake_case)]
 //TODO: Add LR actual function to print
 use std::io;
 //Node Stuff
-struct Node{
+
+
+pub struct Node{
     val: i64,
 }
 impl Node{
@@ -13,15 +35,9 @@ impl Node{
     }
 
 }
-/**impl Default for Node {
-    fn default() -> Node{
-    Node {
-        val: -1,S
-    }
-    }
-    }*/
 
 //Binary Tree Stuff
+
 struct BinTree{
     root: Node,
     left: Option<Box<BinTree>>,
@@ -112,12 +128,16 @@ impl BinTree{
             }
         }
     }
-    ///Must Keep Track of: 
-    fn delete( &mut self, node:Node){
-        if !self.find(node.val){
-            print!("Value not in tree");
+    
+    fn delete( &mut self, node: i64){
+        //Check if the value to be deleted is in the tree in the first place
+        if !self.find(node){
+            println!("Value not in tree");
             return;};
+        //get here if the value is in, then get to the node and check if it has children.
+        
     }
+    
 }
 #[warn(unconditional_recursion)]
 impl Default for BinTree{
@@ -135,7 +155,7 @@ fn main(){
             io::stdin()
                 .read_line(&mut power_input)
                 .expect("Failed to read line");
-        match power_input.trim() {
+        match power_input.trim().to_uppercase().as_str() {
             "A" =>  add_node_public(&mut b_t),
             "F" => {
                 println!("Please enter the key you want to find:");
@@ -158,7 +178,20 @@ fn main(){
                 }
             },
             "D" => {
-                print!("Delete Not Implemented Yet\n");
+                println!("Enter the key you wish to delete: ");
+                let mut ing = String::new();
+                    io::stdin()
+                        .read_line(&mut ing)
+                        .expect("Failed to read line");
+
+                let key: i64 = match ing.trim().parse() {
+                    Ok(key) => key,
+                    Err(_) => {
+                        println!("Invalid input! Please enter an integer.");
+                        continue;
+                    }
+                };
+                b_t.delete(key);
             },
             "P" => b_t.print(),
             "E" => break,
