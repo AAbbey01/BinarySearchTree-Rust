@@ -19,7 +19,6 @@
 //! 🦀⚠️
 #![recursion_limit = "131072"]
 #![allow(non_snake_case)]
-use core::num;
 //TODO: Add LR actual function to print
 use std::io;
 
@@ -121,7 +120,7 @@ print2DUtil(root->left, space);
         if self.left.is_some(){
             unsafe{self.left.as_ref().unwrap_unchecked().print(space);}
         }
-        for n in crate::COUNT..=space{
+        for _n in crate::COUNT..=space{
             print!(" ");
         }
         self.root.print();
@@ -176,7 +175,7 @@ print2DUtil(root->left, space);
             if b.right.is_some(){a+=1};
             b.print(0);
             println!("{a}");
-
+            
         }else{
             //if key to delete = root value
         }
@@ -253,7 +252,7 @@ fn main(){
                 };
                 b_t.delete(key);
             },
-            "P" => b_t.print(),
+            "P" => b_t.print(0),
             "E" => break,
             _ => print!("Please Input a Valid Arg\n"),
         }
