@@ -39,11 +39,10 @@ impl Node{
 }
 //Binary Tree Stuff
 pub mod BinaryTree{
-    
-
+    use std::{borrow::BorrowMut, cmp::Ordering};
 
     use crate::Nodes;
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct BinTree{
     pub(crate) root: crate::Nodes::Node,
     pub(crate) left: Option<Box<BinTree>>,
@@ -93,27 +92,6 @@ impl BinTree{
             }
         }
     }
-    
-    /*{
-    // Base case
-
-// Increase distance between levels
-space += COUNT;
-
-// Process right child first
-print2DUtil(root->right, space);
-
-// Print current node after space
-// count
-cout << endl;
-for (int i = COUNT; i < space; i++)
-    cout << " ";
-cout << root->data << "\n";
-
-// Process left child
-print2DUtil(root->left, space);
-} */
-    
     pub fn print(&self, spacing: i64 ){
         let space = spacing + crate::COUNT;
         if self.root.val == -1 {return;}
@@ -130,12 +108,6 @@ print2DUtil(root->left, space);
         }
     
     }
-
-
-
-
-
-
     fn add_next(&mut self, node: Nodes::Node){
         if node.val == -1 {return;}
         if self.root.val == -1 {
@@ -157,44 +129,32 @@ print2DUtil(root->left, space);
             }
         }
     }
-    
     pub fn delete( &mut self, node: i64){
-        //Check if the value to be deleted is in the tree in the first place
         if !self.find(node){
             println!("Value not in tree");
-            return;};
-        //get here if the value is in, then get to the node and check if it has children.
-        if node != self.root.val{
-            let mut b = self.foo(node);
-            if b.root.val == -1{
-                println!("error in finding node in tree");
-                return;
-            }
-            let mut a = 0;
-            if b.left.is_some(){a+=1};
-            if b.right.is_some(){a+=1};
-            b.print(0);
-            println!("{a}");
-            
-        }else{
-            //if key to delete = root value
+            return;
         }
+        let mut b: &mut BinTree = self; 
+        while b.root.val != node {
+           if b.root.val == -1{
+            println!("How did you get here, b root is -1");
+            return;
+           }
+           if b.root.val > node{
+            b = unsafe{b.left.as_mut().unwrap_unchecked().borrow_mut()};
+           }else{
+            b = unsafe{b.right.as_mut().unwrap_unchecked().borrow_mut()};
+           }
+        }
+        if b.left.is_none() && b.right.is_none(){
+            b.root.val = -1;
+            return;
+        }
+        //get 
+        if b.left.is_some() && b.right.is_none(){}
+        if b.left.is_none() && b.right.is_some(){}
+        if b.left.is_some() && b.right.is_some(){}
         
-    }
-  
-    fn foo(&mut self, key: i64) -> BinTree{
-        let mut b = BinTree{..Default::default()};
-        if self.root.val == key{
-            return self.to_owned();
-        }
-        if self.root.val > key{
-            //self.left.foo(key);
-            unsafe{b = self.left.as_mut().unwrap_unchecked().foo(key);}
-        }
-        if self.root.val < key{
-            unsafe{b = self.right.as_mut().unwrap_unchecked().foo(key);}
-        }
-        return b;
     }
 }
 #[warn(unconditional_recursion)]
@@ -215,7 +175,31 @@ fn main(){
                 .read_line(&mut power_input)
                 .expect("Failed to read line");
         match power_input.trim().to_uppercase().as_str() {
-            "A" =>  add_node_public(&mut b_t),
+            "A" =>  {
+                let mut numbers = Vec::new();
+                println!("Enter integers (enter -1 to exit):");
+                loop {
+                    let mut input = String::new();
+                    io::stdin()
+                        .read_line(&mut input)
+                        .expect("Failed to read line");
+
+                    let num: i64 = match input.trim().parse() {
+                        Ok(num) => num,
+                        Err(_) => {
+                            println!("Invalid input! Please enter an integer.");
+                            continue;
+                        }
+                    };
+                    if num == -1 {
+                        break;
+                    }
+                    numbers.push(num);
+                }
+                for num in numbers {
+                    b_t.add_node(Nodes::Node{val: num});
+                }
+            },
             "F" => {
                 println!("Please enter the key you want to find:");
                 let mut ing = String::new();
@@ -262,30 +246,3 @@ fn main(){
         
 }
 }
-  
-
-fn add_node_public(n: &mut BinTree){
-    let mut numbers = Vec::new();
-    println!("Enter integers (enter -1 to exit):");
-    loop {
-        let mut input = String::new();
-        io::stdin()
-            .read_line(&mut input)
-            .expect("Failed to read line");
-
-        let num: i64 = match input.trim().parse() {
-            Ok(num) => num,
-            Err(_) => {
-                println!("Invalid input! Please enter an integer.");
-                continue;
-            }
-        };
-        if num == -1 {
-            break;
-        }
-        numbers.push(num);
-    }
-    for num in numbers {
-        n.add_node(Nodes::Node{val: num});
-    }
-} 
