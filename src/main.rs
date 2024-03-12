@@ -197,13 +197,30 @@ impl BinTree{
         while b.root.val != -1 {
             if b.left.is_none(){break;}
             else{
-                b = b.n();
+                b = b.shift_left();
             }
         }
         return b;
     }
-    pub fn n(&mut self) -> &mut BinTree{
+    pub fn shift_left(&mut self) -> &mut BinTree{
         return unsafe{self.left.as_mut().unwrap_unchecked().borrow_mut()};
+    }
+    pub fn shift_right(&mut self) -> &mut BinTree{
+        return unsafe{self.right.as_mut().unwrap_unchecked().borrow_mut()};
+    }
+    pub fn get_predecessor(&mut self) -> Nodes::Node{
+        let mut b: &mut BinTree = unsafe{self.left.as_mut().unwrap_unchecked().borrow_mut()};
+        while b.right.is_some(){
+            b = b.shift_right();
+        }
+        return b.root.clone();
+    }
+    pub fn get_successor(&mut self) -> Nodes::Node{
+        let mut b: &mut BinTree = unsafe{self.right.as_mut().unwrap_unchecked().borrow_mut()};
+        while b.left.is_some(){
+            b = b.shift_left();
+        }
+        return b.root.clone();
     }
 }
 #[warn(unconditional_recursion)]
@@ -217,7 +234,10 @@ fn main(){
     //n.print();
     let mut b_t = BinaryTree::BinTree{..Default::default()};
     loop{
-        print!("Functions (Type the Letter for Each)\nA: Add a Key to the Tree (Until -1 is inputted)\nF: Find if a Key is in the Tree\nD: Delete A Key in the Tree\nP: Print Tree\nE: Exit (Ctrl+C to Force Stop)\nT: Test Mode\n");
+        print!("Functions (Type the Letter for Each)\nA: Add a Key to the Tree (Until -1 is inputted)\n
+        F: Find if a Key is in the Tree\nD: Delete A Key in the Tree\n
+        P: Print Tree\nE: Exit (Ctrl+C to Force Stop)\n
+        T: Test Mode\nGP/GS: Get Predecessor/Successor of the root node\n");
         let mut power_input = String::new();
             io::stdin()
                 .read_line(&mut power_input)
@@ -306,6 +326,8 @@ fn main(){
                 b_t.print(0);
                 break;
             }
+            "GP" => b_t.get_predecessor().print(),
+            "GS" => b_t.get_successor().print(),
             _ => print!("Please Input a Valid Arg\n"),
         } //match input statement
     }//inf loop for input
