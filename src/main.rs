@@ -22,7 +22,7 @@
 //TODO: Add LR actual function to print
 use std::io;
 
-use BinaryTree::BinTree;
+//use BinaryTree::BinTree;
 //Node Stuff
 const COUNT: i64 = 5;
 pub mod Nodes{
@@ -39,7 +39,7 @@ impl Node{
 }
 //Binary Tree Stuff
 pub mod BinaryTree{
-    use std::{borrow::BorrowMut, cmp::Ordering};
+    use std::borrow::BorrowMut;
 
     use crate::Nodes;
 #[derive(Debug)]
@@ -146,15 +146,49 @@ impl BinTree{
             b = unsafe{b.right.as_mut().unwrap_unchecked().borrow_mut()};
            }
         }
-        if b.left.is_none() && b.right.is_none(){
-            b.root.val = -1;
-            return;
-        }
+        if b.left.is_none() && b.right.is_none(){b.root.val = -1;}
         //get 
-        if b.left.is_some() && b.right.is_none(){}
-        if b.left.is_none() && b.right.is_some(){}
-        if b.left.is_some() && b.right.is_some(){}
+        if b.left.is_some() && b.right.is_none(){b.successLeft();}
+        if b.left.is_none() && b.right.is_some(){b.successRight();}
+        if b.left.is_some() && b.right.is_some(){
+            let c= b.successor().root.val;
+            //let temp = b.root.val;
+            b.delete(c);
+            b.root.val = c;
+        }
         
+    }
+    pub fn successLeft(&mut self){
+       // println!("Yes we moved on, to {}",self.root.val);
+        if self.left.is_some() {
+            self.root.val = unsafe{self.left.as_mut().unwrap_unchecked().root.val};
+            unsafe{self.left.as_mut().unwrap_unchecked().successLeft();}
+        }else{
+            self.root.val = -1;
+        }
+    }
+    pub fn successRight(&mut self){
+        //println!("Yes we moved on, to {}",self.root.val);
+        if self.right.is_some() {
+            self.root.val = unsafe{self.right.as_mut().unwrap_unchecked().root.val};
+            unsafe{self.right.as_mut().unwrap_unchecked().successRight();}
+        }else{
+            self.root.val = -1;
+        }
+    }
+    pub fn successor(&mut self) -> &mut BinTree{
+        let mut b: &mut BinTree = unsafe{self.right.as_mut().unwrap_unchecked().borrow_mut()};
+        while b.root.val != -1 {
+            if b.left.is_none(){break;}
+            else{
+                b = b.n();
+            }
+
+        }
+        return b;
+    }
+    pub fn n(&mut self) -> &mut BinTree{
+        return unsafe{self.left.as_mut().unwrap_unchecked().borrow_mut()};
     }
 }
 #[warn(unconditional_recursion)]
@@ -169,7 +203,7 @@ fn main(){
     //n.print();
     let mut b_t = BinaryTree::BinTree{..Default::default()};
     loop{
-        print!("Functions (Type the Letter for Each)\nA: Add a Key to the Tree (Until -1 is inputted)\nF: Find if a Key is in the Tree\nD: Delete A Key in the Tree\nP: Print Tree\nE: Exit (Ctrl+C to Force Stop)\n");
+        print!("Functions (Type the Letter for Each)\nA: Add a Key to the Tree (Until -1 is inputted)\nF: Find if a Key is in the Tree\nD: Delete A Key in the Tree\nP: Print Tree\nE: Exit (Ctrl+C to Force Stop)\nT: Test Mode\n");
         let mut power_input = String::new();
             io::stdin()
                 .read_line(&mut power_input)
@@ -238,6 +272,26 @@ fn main(){
             },
             "P" => b_t.print(0),
             "E" => break,
+            "T" => {
+                println!("Test values supplied by my friend Grimgar");
+                let numbers = vec![87,1,3,58,99,69,70,31,41,59,26,18];
+                for num in numbers {
+                    println!("{num} added to the bst");
+                    b_t.add_node(Nodes::Node{val: num});
+                }
+                println!("A print of the tree, before Any Tests");
+                b_t.print(0);
+                println!("We will remove value 31");
+                b_t.delete(31);
+                println!("And now Print the tree");
+                b_t.print(0);
+                println!("Now we will try to delete 90, which is not in the tree");
+                b_t.delete(90);
+                println!("Now test deleting 58");
+                b_t.delete(58);
+                b_t.print(0);
+                break;
+            }
             _ => print!("Please Input a Valid Arg\n"),
         }
         
