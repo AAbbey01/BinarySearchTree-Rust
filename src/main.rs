@@ -5,7 +5,7 @@
 //! - When run normally, users will be able to interract with the terminal to create and modify the tree
 //! - Users will be able to use functions such as:
 //!  - [x] adding nodes to a tree
-//!  - [ ] deleting nodes
+//!  - [x] deleting nodes
 //!  - [x] finding a node in the tree
 //!  - [x] displaying the tree
 //! Example:
@@ -14,45 +14,62 @@
 //! tree.add_node(Node{val:14});
 //! tree.add_node(Node{val:15});
 //! tree.add_node(Node{val:13});
-//! tree.print();
+//! tree.print(0);
+//! tree.delete(14);
+//! tree.print(0);
 //! ```
 //! 🦀⚠️
 #![recursion_limit = "131072"]
 #![allow(non_snake_case)]
-//TODO: Add LR actual function to print
 use std::io;
-
-//use BinaryTree::BinTree;
-//Node Stuff
+///This is a constant variable for spacing when printing the Tree.
 const COUNT: i64 = 5;
+///Simple module defining the Node structure and its implementations
 pub mod Nodes{
 #[derive(Debug,Clone)]
+    ///Creates a node with a value
+    /// ````
+    /// Node{val: 14};
+    /// ````
     pub struct Node{
-    pub(crate) val: i64,
-}
-impl Node{
-    
-    pub fn print(&self){
-        print!("{}\n", self.val);
+        pub(crate) val: i64,
+    }
+    impl Node{
+        pub fn print(&self){
+            print!("{}\n", self.val);
+        }
     }
 }
-}
-//Binary Tree Stuff
+///Module that houses all Binary Tree Operations
 pub mod BinaryTree{
     use std::borrow::BorrowMut;
 
     use crate::Nodes;
 #[derive(Debug)]
+/**A Binary Tree has a root node, and possibly a left and right subtree.
+Option is used to allow the possibility that a left/right subtree is not defined.
+Box is used to control recursive errors: i.e. there is only a Box when there is a subtree */
 pub struct BinTree{
+    ///Holds the Root Node of the tree
     pub(crate) root: crate::Nodes::Node,
-    pub(crate) left: Option<Box<BinTree>>,
-    pub(crate) right: Option<Box<BinTree>>,
+    ///The Possibility of a left subtree
+    pub(crate) left: Option<Box<BinTree>>, 
+    ///The Possibility of a right subtree
+    pub(crate) right: Option<Box<BinTree>>, 
     
 }
 impl BinTree{
     
     pub fn find(&self, key: i64) -> bool{
-        //print!("{} is the current root\n", self.root.val);
+        //!Find is called by a tree and inputs a key. returns true if the key is in the node.
+        //! ```rust
+        //! let mut tree = BinTree{..Default::default()};
+        //! tree.add_node(Node{val:14});
+        //! tree.add_node(Node{val:15});
+        //! tree.add_node(Node{val:13});
+        //! asserteq!(tree.find(17,false));
+        //! assert!(tree.find(14));
+        //! ```
         let mut b = false;
         if self.root.val == key{
             //println!("Found {key}");
@@ -155,8 +172,7 @@ impl BinTree{
             //let temp = b.root.val;
             b.delete(c);
             b.root.val = c;
-        }
-        
+        } 
     }
     pub fn successLeft(&mut self){
        // println!("Yes we moved on, to {}",self.root.val);
@@ -183,7 +199,6 @@ impl BinTree{
             else{
                 b = b.n();
             }
-
         }
         return b;
     }
@@ -198,7 +213,6 @@ impl Default for BinTree{
     }
 }
 }
-
 fn main(){
     //n.print();
     let mut b_t = BinaryTree::BinTree{..Default::default()};
@@ -293,10 +307,6 @@ fn main(){
                 break;
             }
             _ => print!("Please Input a Valid Arg\n"),
-        }
-        
-        //b_t.root.print();
-        //b_t.print();
-        
-}
+        } //match input statement
+    }//inf loop for input
 }
