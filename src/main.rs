@@ -22,6 +22,7 @@
 #![recursion_limit = "131072"]
 #![allow(non_snake_case)]
 use std::io;
+//use eframe::egui;
 ///This is a constant variable for spacing when printing the Tree.
 const COUNT: i64 = 5;
 ///Simple module defining the Node structure and its implementations
@@ -43,9 +44,8 @@ pub mod Nodes{
 ///Module that houses all Binary Tree Operations
 pub mod BinaryTree{
     use std::borrow::BorrowMut;
-
-    use crate::Nodes;
-#[derive(Debug)]
+    use crate::{Nodes::{self}, Stats::Stats};
+#[derive(Debug,Clone)]
 /**A Binary Tree has a root node, and possibly a left and right subtree.
 Option is used to allow the possibility that a left/right subtree is not defined.
 Box is used to control recursive errors: i.e. there is only a Box when there is a subtree */
@@ -59,7 +59,6 @@ pub struct BinTree{
     
 }
 impl BinTree{
-    
     pub fn find(&self, key: i64) -> bool{
         //!Find is called by a tree and inputs a key. returns true if the key is in the node.
         //! ```rust
@@ -73,7 +72,7 @@ impl BinTree{
         let mut b = false;
         if self.root.val == key{
             //println!("Found {key}");
-            return true;
+            b = true;
         }else{
             if self.root.val > key{
                 if self.left.is_some(){   
@@ -88,6 +87,7 @@ impl BinTree{
     }
     pub fn add_node(&mut self, node: crate::Nodes::Node){
         //print!("Adding to {}\n",self.root.val);
+        if node.val == self.root.val {println!("Node already in tree"); return;}
         if node.val == -1 {return;}
         if self.root.val == -1 {
             self.root = node;
@@ -97,7 +97,7 @@ impl BinTree{
             if !self.left.is_some(){
             self.left = Some(Box::new(BinTree{root: node, ..Default::default()}));
             }else{
-               unsafe {let _ = &self.left.as_mut().unwrap_unchecked().add_next(node);}
+               unsafe {let _ = &self.left.as_mut().unwrap_unchecked().add_node(node);}
             }
             
         }else{
@@ -105,7 +105,7 @@ impl BinTree{
             if !self.right.is_some(){
                 self.right =  Some(Box::new(BinTree{root: node, ..Default::default()}));
             }else{
-                unsafe {let _ = &self.right.as_mut().unwrap_unchecked().add_next(node);}
+                unsafe {let _ = &self.right.as_mut().unwrap_unchecked().add_node(node);}
             }
         }
     }
@@ -222,6 +222,40 @@ impl BinTree{
         }
         return b.root.clone();
     }
+    pub fn balance(&mut self, s: Stats){
+        let mut b_b = BinTree{..Default::default()};
+
+        let mut t:Vec<i64> = Vec::new();
+        for num in s.list{
+            t.push(num);
+        }
+        t.sort();
+        for num in t{
+            b_b.add_node(Nodes::Node { val: (num) });
+        } 
+        b_b.print(0);
+        
+    }
+    pub fn add_2(&mut self, node: Nodes::Node){
+        if node.val == -1 {return;}
+        if self.root.val == -1 {
+            self. root = node;
+            return;
+        }
+        if self.root.val > node.val{
+            match self.left{
+                Some(_) => {self.left.as_mut().unwrap().add_next(node)},
+                None => self.left = Some(Box::new(BinTree{root: node, ..Default::default()})),
+            }
+            
+        }else{
+           match self.right{
+            Some(_) => {self.right.as_mut().unwrap().add_next(node)},
+            None => self.right = Some(Box::new(BinTree{root: node, ..Default::default()})),
+           }
+        }
+    }
+    
 }
 #[warn(unconditional_recursion)]
 impl Default for BinTree{
@@ -230,14 +264,72 @@ impl Default for BinTree{
     }
 }
 }
+///Module that holds statistics for the BST
+/// #[derive(Debug,Clone)]
+pub mod Stats{
+    #[derive(Debug,Clone)]
+    pub struct Stats{
+        pub(crate)count: i64,
+        pub(crate)list: Vec<i64>,
+    }
+    impl Stats{
+        pub fn add(&mut self, val: i64){
+            self.list.push(val);
+                self.count +=1;
+        }
+        pub fn add_list(&mut self, mut lis: Vec<i64>) -> bool{
+
+            self.list.append(&mut lis);
+            if self.list.len() as i64 != self.count + lis.len() as i64 {
+                return false;
+            }
+            self.count += lis.len() as i64;
+            return true;
+        }
+        pub fn remove(&mut self, val: i64) -> bool{
+            let  k = 0;
+            let b = self.list.remove(self.list.iter().position(|&r | r == val).unwrap_or_else(|| k));
+            //self.list.remove(self.list.iter().position(|&r | r == val).unwrap_or_else(b = false)); 
+            if b == val{
+                self.count-=1;
+                return true;
+            }
+            return false;  
+        }
+        pub fn print_count(&mut self){
+            println!("# of Nodes: {}",self.count);
+        }
+        pub fn print_list(&mut self){
+            print!("List of Nodes: ");
+            let last = self.list.last().unwrap();
+            for num in &self.list{
+                print!("{}",num);
+                if last == num {print!("\n")} else {print!(", ")}
+            }
+        }
+        pub fn print(&mut self){
+            self.print_count();
+            self.print_list();
+        }
+    }
+
+    impl Default for Stats{
+        fn default() -> Self {
+            Stats{count: 0, list: Vec::new()}
+        }
+    }
+
+}
+
 fn main(){
     //n.print();
+    
     let mut b_t = BinaryTree::BinTree{..Default::default()};
+    let mut stat_track = Stats::Stats{..Default::default()};
     loop{
-        print!("Functions (Type the Letter for Each)\nA: Add a Key to the Tree (Until -1 is inputted)\n
-        F: Find if a Key is in the Tree\nD: Delete A Key in the Tree\n
-        P: Print Tree\nE: Exit (Ctrl+C to Force Stop)\n
-        T: Test Mode\nGP/GS: Get Predecessor/Successor of the root node\n");
+        print!("Functions (Type the Letter(s) for Each)\nA: Add a Key to the Tree (Until -1 is inputted)\nB: Creates a (seperate) balanced tree
+        \nD: Delete A Key in the Tree\nF: Find if a Key is in the Tree\nGP/GS: Get Predecessor/Successor of the root node
+        \nP: Print Tree\nT[1-2]: Test Mode\nE: Exit (Ctrl+C to Force Stop)\nS: Display Stats\nR: Random Tree (Prompts for # of nodes)\n");
         let mut power_input = String::new();
             io::stdin()
                 .read_line(&mut power_input)
@@ -264,9 +356,16 @@ fn main(){
                     }
                     numbers.push(num);
                 }
+                
                 for num in numbers {
                     b_t.add_node(Nodes::Node{val: num});
+                    stat_track.add(num);
                 }
+            },
+            "B" =>{
+                let mut bal = b_t.clone();
+                let s = stat_track.clone();
+                bal.balance(s);
             },
             "F" => {
                 println!("Please enter the key you want to find:");
@@ -306,29 +405,117 @@ fn main(){
             },
             "P" => b_t.print(0),
             "E" => break,
-            "T" => {
-                println!("Test values supplied by my friend Grimgar");
-                let numbers = vec![87,1,3,58,99,69,70,31,41,59,26,18];
-                for num in numbers {
-                    println!("{num} added to the bst");
-                    b_t.add_node(Nodes::Node{val: num});
-                }
-                println!("A print of the tree, before Any Tests");
-                b_t.print(0);
-                println!("We will remove value 31");
-                b_t.delete(31);
-                println!("And now Print the tree");
-                b_t.print(0);
-                println!("Now we will try to delete 90, which is not in the tree");
-                b_t.delete(90);
-                println!("Now test deleting 58");
-                b_t.delete(58);
-                b_t.print(0);
+            "T1" => {
+                test_1(b_t);
                 break;
             }
-            "GP" => b_t.get_predecessor().print(),
-            "GS" => b_t.get_successor().print(),
+            "T2" =>{test_2(b_t); return;},
+            "T3" => {test_3(b_t); return;},
+            "GP" => {print!("Root nodes predecessor: "); b_t.get_predecessor().print();},
+            "GS" => {print!("Root nodes successor: "); b_t.get_successor().print();},
+            "S" => {
+                stat_track.print_count();
+                stat_track.print_list();
+
+            },
+            "R" => {
+                println!("Enter how many nodes you want:  ");
+                let mut ing = String::new();
+                    io::stdin()
+                        .read_line(&mut ing)
+                        .expect("Failed to read line");
+
+                let key: i64 = match ing.trim().parse() {
+                    Ok(key) => key,
+                    Err(_) => {
+                        println!("Invalid input! Please enter an integer.");
+                        continue;
+                    }
+                };
+                let mut rng = rand::thread_rng();
+                for _num in 1..key{
+                    let x:i64 = rng.gen();
+                    b_t.add_node(Nodes::Node { val: (x) });
+                    stat_track.add(x);
+                    stat_track.list.sort();
+                }
+            }
             _ => print!("Please Input a Valid Arg\n"),
         } //match input statement
+        
+        
     }//inf loop for input
+}
+/*fn pause() {
+
+    print!("Press any key to continue");
+        let mut _pause = String::new();
+            io::stdin()
+                .read_line( &mut pause)
+                .expect("Failed to read line");
+}*/
+fn test_1(mut b_t: BinaryTree::BinTree){
+    let mut stat_t1 = Stats::Stats{..Default::default()};
+    println!("Test values supplied by my friend Grimgar");
+    let numbers = vec![87,1,3,58,99,69,70,31,41,59,26,18];
+    for num in numbers {
+        println!("{num} added to the bst");
+        b_t.add_2(Nodes::Node{val: num});
+        stat_t1.add(num);
+    }
+    println!("A print of the tree, before Any Tests");
+    b_t.print(0);
+    stat_t1.print();
+    println!("We will remove value 31");
+    b_t.delete(31);
+    stat_t1.remove(31);
+    println!("And now Print the tree");
+    b_t.print(0);
+    stat_t1.print();
+    println!("Now we will try to delete 90, which is not in the tree");
+    b_t.delete(90);
+    stat_t1.remove(90);
+    println!("Now test deleting 58");
+    b_t.delete(58);
+    b_t.print(0);
+    stat_t1.remove(58);
+    stat_t1.print();
+}
+use rand::prelude::*;
+
+fn test_2(mut b_t: BinaryTree::BinTree){
+    let mut stats_test2 = Stats::Stats{..Default::default()};
+    let mut rng = rand::thread_rng();
+    let mut nums: Vec<i64> = (0..32).collect();
+    nums.shuffle(&mut rng);
+    for n in nums{
+        b_t.add_node(Nodes::Node { val: (n) });
+        stats_test2.add(n);
+    }
+    b_t.print(0);
+    println!("Root Node: {}", b_t.root.val);
+    println!("Root Predecessor: {}",b_t.get_predecessor().val);
+    println!("Root Successor: {}", b_t.get_successor().val);
+    stats_test2.print_count();
+    stats_test2.print_list();
+    println!("Tree\\{}",b_t.root.val);
+    stats_test2.remove(b_t.root.val);
+    b_t.delete(b_t.root.val);
+    b_t.print(0);
+    stats_test2.print_count();
+    stats_test2.print_list();
+}
+fn test_3(mut b_t: BinaryTree::BinTree){
+    let mut s: Stats::Stats = Stats::Stats { ..Default::default() };
+    let mut rng = rand::thread_rng();
+    let mut nums: Vec<i64> = (1..32).collect();
+    nums.shuffle(&mut rng);
+    for n in nums{
+        b_t.add_node(Nodes::Node { val: (n) });
+        s.add(n);
+    }
+    b_t.print(0);
+    let mut bal = b_t.clone();
+    let st = s.clone();
+    bal.balance(st);
 }
