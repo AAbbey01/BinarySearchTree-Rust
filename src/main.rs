@@ -21,7 +21,8 @@
 //! 🦀⚠️
 #![recursion_limit = "131072"]
 #![allow(non_snake_case)]
-use std::io;
+use std::{fs::File, io::{self, BufRead, BufReader}};
+static PATH:&str = "src\\user_params.txt";
 //use eframe::egui;
 ///This is a constant variable for spacing when printing the Tree.
 const COUNT: i64 = 5;
@@ -322,14 +323,20 @@ pub mod Stats{
 }
 
 fn main(){
-    //n.print();
-    
     let mut b_t = BinaryTree::BinTree{..Default::default()};
     let mut stat_track = Stats::Stats{..Default::default()};
+    let file:File = File::open(PATH).expect("Reason");
+    let reader = BufReader::new(file);
+    let lines: Vec<_> = reader.lines().collect();
+            
+    
     loop{
-        print!("Functions (Type the Letter(s) for Each)\nA: Add a Key to the Tree (Until -1 is inputted)\nB: Creates a (seperate) balanced tree
-        \nD: Delete A Key in the Tree\nF: Find if a Key is in the Tree\nGP/GS: Get Predecessor/Successor of the root node
-        \nP: Print Tree\nT[1-2]: Test Mode\nE: Exit (Ctrl+C to Force Stop)\nS: Display Stats\nR: Random Tree (Prompts for # of nodes)\n");
+        for l in &lines{
+            match l{
+                Ok(t) => println!("{}",t),
+                _ => {},
+            }
+        }
         let mut power_input = String::new();
             io::stdin()
                 .read_line(&mut power_input)

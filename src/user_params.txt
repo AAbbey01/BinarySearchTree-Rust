@@ -1,0 +1,11 @@
+Functions (Type the Letter(s) for Each)
+A: Add a Key to the Tree (Until -1 is inputted)
+B: Creates a (seperate) balanced tree
+D: Delete A Key in the Tree
+F: Find if a Key is in the Tree
+GP/GS: Get Predecessor/Successor of the root node
+P: Print Tree
+T[1-2]: Test Mode
+E: Exit (Ctrl+C to Force Stop)
+S: Display Stats
+R: Random Tree (Prompts for # of nodes)
