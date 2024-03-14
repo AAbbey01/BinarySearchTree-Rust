@@ -23,7 +23,7 @@
 #![allow(non_snake_case)]
 use std::{fs::File, io::{self, BufRead, BufReader}};
 static PATH:&str = "src\\user_params.txt";
-//use eframe::egui;
+use eframe::egui;
 ///This is a constant variable for spacing when printing the Tree.
 const COUNT: i64 = 5;
 ///Simple module defining the Node structure and its implementations
@@ -120,11 +120,9 @@ impl BinTree{
             print!(" ");
         }
         self.root.print();
-        if self.right.is_some(){
-            
+        if self.right.is_some(){ 
             unsafe{self.right.as_ref().unwrap_unchecked().print(space);}
         }
-    
     }
     fn add_next(&mut self, node: Nodes::Node){
         if node.val == -1 {return;}
@@ -137,8 +135,7 @@ impl BinTree{
             self.left = Some(Box::new(BinTree{root: node, ..Default::default()}));
             }else{
                unsafe {let _ = &self.left.as_mut().unwrap_unchecked().add_next(node);}
-            }
-            
+            }    
         }else{
             if !self.right.is_some(){
                 self.right =  Some(Box::new(BinTree{root: node, ..Default::default()}));
@@ -225,7 +222,6 @@ impl BinTree{
     }
     pub fn balance(&mut self, s: Stats){
         let mut b_b = BinTree{..Default::default()};
-
         let mut t:Vec<i64> = Vec::new();
         for num in s.list{
             t.push(num);
@@ -235,7 +231,6 @@ impl BinTree{
             b_b.add_node(Nodes::Node { val: (num) });
         } 
         b_b.print(0);
-        
     }
     pub fn add_2(&mut self, node: Nodes::Node){
         if node.val == -1 {return;}
@@ -248,7 +243,6 @@ impl BinTree{
                 Some(_) => {self.left.as_mut().unwrap().add_next(node)},
                 None => self.left = Some(Box::new(BinTree{root: node, ..Default::default()})),
             }
-            
         }else{
            match self.right{
             Some(_) => {self.right.as_mut().unwrap().add_next(node)},
@@ -256,7 +250,6 @@ impl BinTree{
            }
         }
     }
-    
 }
 #[warn(unconditional_recursion)]
 impl Default for BinTree{
@@ -323,12 +316,19 @@ pub mod Stats{
 }
 
 fn main(){
+    env_logger::init();
+    let options = eframe::NativeOptions::default();
+    eframe::run_native(
+        "Keyboard events",
+        options,
+        Box::new(|_cc| Box::<egui_stuff::Content>::default()),
+    );
+    
     let mut b_t = BinaryTree::BinTree{..Default::default()};
-    let mut stat_track = Stats::Stats{..Default::default()};
+    let mut stat_track = Stats::Stats{..Default::default()};    
     let file:File = File::open(PATH).expect("Reason");
     let reader = BufReader::new(file);
     let lines: Vec<_> = reader.lines().collect();
-            
     
     loop{
         for l in &lines{
@@ -525,4 +525,47 @@ fn test_3(mut b_t: BinaryTree::BinTree){
     let mut bal = b_t.clone();
     let st = s.clone();
     bal.balance(st);
+}
+
+
+pub mod egui_stuff{
+    use eframe::egui::{self, Key, ScrollArea};
+
+    pub struct Content {
+        text: String,
+    }
+    impl Default for Content{
+        fn default() -> Self {
+            Content{text: "".to_owned(),}
+        }
+    }
+
+
+    impl eframe::App for Content {
+         fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+            egui::CentralPanel::default().show(ctx, |ui| {
+                ui.heading("Press/Hold/Release example. Press A to test.");
+                if ui.button("Clear").clicked() {
+                    self.text.clear();
+                }
+                ScrollArea::vertical()
+                    .auto_shrink(false)
+                    .stick_to_bottom(true)
+                    .show(ui, |ui| {
+                        ui.label(&self.text);
+                    });
+    
+                if ctx.input(|i| i.key_pressed(Key::A)) {
+                    self.text.push_str("\nPressed");
+                }
+                if ctx.input(|i| i.key_down(Key::A)) {
+                    self.text.push_str("\nHeld");
+                    ui.ctx().request_repaint(); // make sure we note the holding.
+                }
+                if ctx.input(|i| i.key_released(Key::A)) {
+                    self.text.push_str("\nReleased");
+                }
+            });
+        }
+    }
 }
