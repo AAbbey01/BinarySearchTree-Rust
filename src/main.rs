@@ -9,7 +9,7 @@
 //!  - [x] finding a node in the tree
 //!  - [x] displaying the tree
 //! Example:
-//! ```
+//! ```rust
 //! let mut tree = BinTree{..Default::default()};
 //! tree.add_node(Node{val:14});
 //! tree.add_node(Node{val:15});
@@ -23,7 +23,7 @@
 #![allow(non_snake_case)]
 use std::{fs::File, io::{self, BufRead, BufReader}};
 static PATH:&str = "src\\user_params.txt";
-use eframe::egui;
+//use eframe::egui;
 ///This is a constant variable for spacing when printing the Tree.
 const COUNT: i64 = 5;
 ///Simple module defining the Node structure and its implementations
@@ -37,6 +37,7 @@ pub mod Nodes{
         pub(crate) val: i64,
     }
     impl Node{
+        ///Prints the value of the node
         pub fn print(&self){
             print!("{}\n", self.val);
         }
@@ -113,15 +114,16 @@ impl BinTree{
     pub fn print(&self, spacing: i64 ){
         let space = spacing + crate::COUNT;
         if self.root.val == -1 {return;}
-        if self.left.is_some(){
-            unsafe{self.left.as_ref().unwrap_unchecked().print(space);}
+        if self.right.is_some(){ 
+            unsafe{self.right.as_ref().unwrap_unchecked().print(space);}
         }
+        
         for _n in crate::COUNT..=space{
             print!(" ");
         }
         self.root.print();
-        if self.right.is_some(){ 
-            unsafe{self.right.as_ref().unwrap_unchecked().print(space);}
+        if self.left.is_some(){
+            unsafe{self.left.as_ref().unwrap_unchecked().print(space);}
         }
     }
     fn add_next(&mut self, node: Nodes::Node){
@@ -316,14 +318,6 @@ pub mod Stats{
 }
 
 fn main(){
-    env_logger::init();
-    let options = eframe::NativeOptions::default();
-    eframe::run_native(
-        "Keyboard events",
-        options,
-        Box::new(|_cc| Box::<egui_stuff::Content>::default()),
-    );
-    
     let mut b_t = BinaryTree::BinTree{..Default::default()};
     let mut stat_track = Stats::Stats{..Default::default()};    
     let file:File = File::open(PATH).expect("Reason");
@@ -525,47 +519,4 @@ fn test_3(mut b_t: BinaryTree::BinTree){
     let mut bal = b_t.clone();
     let st = s.clone();
     bal.balance(st);
-}
-
-
-pub mod egui_stuff{
-    use eframe::egui::{self, Key, ScrollArea};
-
-    pub struct Content {
-        text: String,
-    }
-    impl Default for Content{
-        fn default() -> Self {
-            Content{text: "".to_owned(),}
-        }
-    }
-
-
-    impl eframe::App for Content {
-         fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-            egui::CentralPanel::default().show(ctx, |ui| {
-                ui.heading("Press/Hold/Release example. Press A to test.");
-                if ui.button("Clear").clicked() {
-                    self.text.clear();
-                }
-                ScrollArea::vertical()
-                    .auto_shrink(false)
-                    .stick_to_bottom(true)
-                    .show(ui, |ui| {
-                        ui.label(&self.text);
-                    });
-    
-                if ctx.input(|i| i.key_pressed(Key::A)) {
-                    self.text.push_str("\nPressed");
-                }
-                if ctx.input(|i| i.key_down(Key::A)) {
-                    self.text.push_str("\nHeld");
-                    ui.ctx().request_repaint(); // make sure we note the holding.
-                }
-                if ctx.input(|i| i.key_released(Key::A)) {
-                    self.text.push_str("\nReleased");
-                }
-            });
-        }
-    }
 }
