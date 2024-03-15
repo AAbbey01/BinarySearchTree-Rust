@@ -1,7 +1,7 @@
 # unsafe_bst
 
 [![Crates.io](https://img.shields.io/crates/v/unsafe_bst)](https://crates.io/crates/unsafe_bst)
-[![Docs.rs](https://docs.rs/unsafe_bst/badge.svg)](https://docs.rs/unsafe_bst/)
+[![Docs.rs](https://docs.rs/unsafe_bst/badge.svg)]([https://docs.rs/unsafe_bst/](https://docs.rs/the_one/latest/the_one/))
 
 # Examples
 
