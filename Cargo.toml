@@ -1,5 +1,5 @@
 [package]
-name = "the_one"
+name = "unsafe_bst"
 version = "0.1.2"
 edition = "2021"
 description = "This is a simple bst crate, created as a project for class"

@@ -22,7 +22,6 @@
 #![recursion_limit = "131072"]
 #![allow(non_snake_case)]
 use std::{fs::File, io::{self, BufRead, BufReader}};
-use the_one::*;
 static PATH:&str = "src\\user_params.txt";
 //use eframe::egui;
 ///This is a constant variable for spacing when printing the Tree.
@@ -30,8 +29,8 @@ static PATH:&str = "src\\user_params.txt";
 
 
 fn main(){
-    let mut b_t = the_one::binary_tree::BinTree{..Default::default()};
-    let mut stat_track = the_one::stats::Stats{..Default::default()};    
+    let mut b_t = unsafe_bst::binary_tree::BinTree{..Default::default()};
+    let mut stat_track = unsafe_bst::stats::Stats{..Default::default()};    
     let file:File = File::open(PATH).expect("Reason");
     let reader = BufReader::new(file);
     let lines: Vec<_> = reader.lines().collect();
@@ -71,7 +70,7 @@ fn main(){
                 }
                 
                 for num in numbers {
-                    b_t.add_node(the_one::nodes::Node{val: num});
+                    b_t.add_node(unsafe_bst::nodes::Node{val: num});
                     stat_track.add(num);
                 }
             },
@@ -116,7 +115,7 @@ fn main(){
                 };
                 b_t.delete(key);
             },
-            "P" => b_t.print(0),
+            "P" => print!("{}",b_t.print(0)),
             "E" => break,
             "T1" => {
                 test_1(b_t);
@@ -148,7 +147,7 @@ fn main(){
                 let mut rng = rand::thread_rng();
                 for _num in 1..key{
                     let x:i64 = rng.gen();
-                    b_t.add_node(the_one::nodes::Node { val: (x) });
+                    b_t.add_node(unsafe_bst::nodes::Node { val: (x) });
                     stat_track.add(x);
                     stat_track.list.sort();
                 }
@@ -167,13 +166,13 @@ fn main(){
                 .read_line( &mut pause)
                 .expect("Failed to read line");
 }*/
-fn test_1(mut b_t: the_one::binary_tree::BinTree){
-    let mut stat_t1 = the_one::stats::Stats{..Default::default()};
+fn test_1(mut b_t: unsafe_bst::binary_tree::BinTree){
+    let mut stat_t1 = unsafe_bst::stats::Stats{..Default::default()};
     println!("Test values supplied by my friend Grimgar");
     let numbers = vec![87,1,3,58,99,69,70,31,41,59,26,18];
     for num in numbers {
         println!("{num} added to the bst");
-        b_t.add_2(the_one::nodes::Node{val: num});
+        b_t.add_2(unsafe_bst::nodes::Node{val: num});
         stat_t1.add(num);
     }
     println!("A print of the tree, before Any Tests");
@@ -196,13 +195,13 @@ fn test_1(mut b_t: the_one::binary_tree::BinTree){
 }
 use rand::prelude::*;
 
-fn test_2(mut b_t: the_one::binary_tree::BinTree){
-    let mut stats_test2 = the_one::stats::Stats{..Default::default()};
+fn test_2(mut b_t: unsafe_bst::binary_tree::BinTree){
+    let mut stats_test2 = unsafe_bst::stats::Stats{..Default::default()};
     let mut rng = rand::thread_rng();
     let mut nums: Vec<i64> = (0..32).collect();
     nums.shuffle(&mut rng);
     for n in nums{
-        b_t.add_node(the_one::nodes::Node { val: (n) });
+        b_t.add_node(unsafe_bst::nodes::Node { val: (n) });
         stats_test2.add(n);
     }
     b_t.print(0);
@@ -218,13 +217,13 @@ fn test_2(mut b_t: the_one::binary_tree::BinTree){
     stats_test2.print_count();
     stats_test2.print_list();
 }
-fn test_3(mut b_t: the_one::binary_tree::BinTree){
-    let mut s: the_one::stats::Stats = the_one::stats::Stats { ..Default::default() };
+fn test_3(mut b_t: unsafe_bst::binary_tree::BinTree){
+    let mut s: unsafe_bst::stats::Stats = unsafe_bst::stats::Stats { ..Default::default() };
     let mut rng = rand::thread_rng();
     let mut nums: Vec<i64> = (1..32).collect();
     nums.shuffle(&mut rng);
     for n in nums{
-        b_t.add_node(the_one::nodes::Node { val: (n) });
+        b_t.add_node(unsafe_bst::nodes::Node { val: (n) });
         s.add(n);
     }
     b_t.print(0);

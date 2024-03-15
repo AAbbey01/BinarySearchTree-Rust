@@ -86,11 +86,14 @@ pub mod nodes{
                 }
             }
         }
-        pub fn print(&self, spacing: i64 ){
+        pub fn print(&self, spacing: i64 ) -> String{
+            let mut r:String = String::new();
             let space = spacing + 5;
-            if self.root.val == -1 {return;}
+            if self.root.val == -1 {return r;}
             if self.right.is_some(){ 
-                unsafe{self.right.as_ref().unwrap_unchecked().print(space);}
+                
+                    let t = unsafe{self.right.as_ref().unwrap_unchecked().print(space)};
+                    r = format!("{} {}\n",r,t);
             }
             
             for _n in 5..=space{
@@ -98,9 +101,12 @@ pub mod nodes{
             }
             self.root.print();
             if self.left.is_some(){
-                unsafe{self.left.as_ref().unwrap_unchecked().print(space);}
+                let t = unsafe{self.left.as_ref().unwrap_unchecked().print(space)};
+                r = format!("{} {}\n",r,t);
             }
+            return r;
         }
+
         fn add_next(&mut self, node: nodes::Node){
             if node.val == -1 {return;}
             if self.root.val == -1 {
