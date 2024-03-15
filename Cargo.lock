@@ -62,8 +62,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "theOne"
-version = "0.1.0"
+name = "the_one"
+version = "0.1.2"
 dependencies = [
  "rand",
 ]

@@ -1,6 +1,6 @@
 [package]
-name = "theOne"
-version = "0.1.0"
+name = "the_one"
+version = "0.1.2"
 edition = "2021"
 description = "This is a simple bst crate, created as a project for class"
 license = "MIT OR Apache-2.0"
