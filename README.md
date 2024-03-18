@@ -6,10 +6,10 @@
 # Examples
 
 This will print a tree with a root of 13, right value of 15, and left value of 11 \
-And it will look like this:\
+And it will look like this:
 <pre>
-    11\
-13\
+    11
+13
     15
 </pre>
 ```rust
