@@ -1,7 +1,7 @@
 # unsafe_bst
 
 [![Crates.io](https://img.shields.io/crates/v/unsafe_bst)](https://crates.io/crates/unsafe_bst)
-[![Docs.rs](https://docs.rs/unsafe_bst/badge.svg)]((https://docs.rs/unsafe_bst/0.2.2/unsafe_bst/))
+[![Docs.rs](https://docs.rs/unsafe_bst/badge.svg)](https://docs.rs/unsafe_bst/0.2.2/unsafe_bst/)
 
 # Overview
 unsafe_bst's main functionality is a library that can create and maintain a binary search tree. \
