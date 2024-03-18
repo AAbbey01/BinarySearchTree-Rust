@@ -74,8 +74,13 @@ b_t.add_node(unsafe_bst::nodes::Node{val: 15});
 b_t.add_node(unsafe_bst::nodes::Node{val: 11});
 print!("{}",b_t.print(0));
 ```
+
+=====================================================
+
+
 # Changelog:
+v0.3.0 - Started to make code safer: removed unsafe calls in every function other than delete
 v0.2.2 - Fixed delete (at least, all seen errors)\
 v0.2.1 - fixed balance so that is properly functions\
 v0.2.0 - renamed crate to "unsafe-bst"\
-v0.1.0 - Created Crate
+v0.1.0 - Created Crate under name "the_one"

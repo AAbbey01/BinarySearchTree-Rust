@@ -52,12 +52,11 @@ pub mod nodes{
                 b = true;
             }else{
                 if self.root.val > key{
-                    if self.left.is_some(){   
-                        //println!("{key} too small, going left");         
-                        unsafe{b = self.left.as_ref().unwrap_unchecked().find(key);}
-                }}else if self.right.is_some(){
-                    //println!("{key} too big, going right");
-                    unsafe{b = self.right.as_ref().unwrap_unchecked().find(key);}
+                    if self.left.is_some(){       
+                        b = self.left.as_ref().unwrap().find(key);
+                    }
+                }else if self.right.is_some(){
+                    b = self.right.as_ref().unwrap().find(key);
                 }
             }
             return b;
@@ -76,19 +75,15 @@ pub mod nodes{
                 return;
             }
             if self.root.val > node.val{
-                if !self.left.is_some(){
-                self.left = Some(Box::new(BinTree{root: node, ..Default::default()}));
-                }else{
-                   unsafe {let _ = &self.left.as_mut().unwrap_unchecked().add_node(node);}
-                }
-                
+                match self.left{
+                    Some(_) => self.left.as_mut().unwrap().add_node(node),
+                    None => self.left = Some(Box::new(BinTree {root: node, ..Default::default() })),
+                }         
             }else{
-                //print!("{0} > {1}\n",node.val,self.root.val);
-                if !self.right.is_some(){
-                    self.right =  Some(Box::new(BinTree{root: node, ..Default::default()}));
-                }else{
-                    unsafe {let _ = &self.right.as_mut().unwrap_unchecked().add_node(node);}
-                }
+                match self.right{
+                    Some(_) => self.right.as_mut().unwrap().add_node(node),
+                    None => self.right = Some(Box::new(BinTree {root: node, ..Default::default() })),
+                }      
             }
         }
         pub fn print(&self, spacing: i64 ) -> String{
@@ -110,17 +105,15 @@ pub mod nodes{
             let space = spacing + 5;
             if self.root.val == -1 {return r;}
             if self.right.is_some(){ 
-                
-                    let t = unsafe{self.right.as_ref().unwrap_unchecked().print(space)};
-                    r = format!("{} {}\n",r,t);
+                let t = self.right.as_ref().unwrap().print(space);
+                r = format!("{} {}\n",r,t);
             }
-            
             for _n in 5..=space{
                 print!(" ");
             }
             self.root.print();
             if self.left.is_some(){
-                let t = unsafe{self.left.as_ref().unwrap_unchecked().print(space)};
+                let t = self.left.as_ref().unwrap().print(space);
                 r = format!("{} {}\n",r,t);
             }
             return r.trim_end().to_owned();
@@ -207,7 +200,7 @@ pub mod nodes{
             //! tree.add_node(Node{val:15});
             //! assert_eq!(15,self.successor().root.val);
             //! ```
-            let mut b: &mut BinTree = unsafe{self.right.as_mut().unwrap_unchecked().borrow_mut()};
+            let mut b: &mut BinTree = self.right.as_mut().unwrap().borrow_mut();
             while b.root.val != -1 {
                 if b.left.is_none(){break;}
                 else{
@@ -218,7 +211,7 @@ pub mod nodes{
         }
         pub fn shift_left(&mut self) -> &mut BinTree{
             //!Shift Left returns the left-subtree of a tree
-            return unsafe{self.left.as_mut().unwrap_unchecked().borrow_mut()};
+            return self.left.as_mut().unwrap().borrow_mut();
         }
         pub fn shift_right(&mut self) -> &mut BinTree{
             //!Shift Right returns the right-subtree of a tree 
@@ -226,7 +219,7 @@ pub mod nodes{
         }
         pub fn get_predecessor(&mut self) -> nodes::Node{
             //!Get Predecessor returns the Node with the next smallest value to root (self)
-            let mut b: &mut BinTree = unsafe{self.left.as_mut().unwrap_unchecked().borrow_mut()};
+            let mut b: &mut BinTree = self.left.as_mut().unwrap().borrow_mut();
             while b.right.is_some(){
                 b = b.shift_right();
             }
@@ -234,7 +227,7 @@ pub mod nodes{
         }
         pub fn get_successor(&mut self) -> nodes::Node{
             //!Get Successor returns the Node with the next largest value to root (self)
-            let mut b: &mut BinTree = unsafe{self.right.as_mut().unwrap_unchecked().borrow_mut()};
+            let mut b: &mut BinTree = self.right.as_mut().unwrap().borrow_mut();
             while b.left.is_some(){
                 b = b.shift_left();
             }
