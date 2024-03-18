@@ -75,9 +75,7 @@ fn main(){
                 }
             },
             "B" =>{
-                let mut bal = b_t.clone();
-                let s = stat_track.clone();
-                bal.balance(s);
+                b_t = b_t.balance(&mut stat_track);
             },
             "F" => {
                 println!("Please enter the key you want to find:");
@@ -227,7 +225,7 @@ fn test_3(mut b_t: unsafe_bst::binary_tree::BinTree){
         s.add(n);
     }
     b_t.print(0);
-    let mut bal = b_t.clone();
-    let st = s.clone();
-    bal.balance(st);
+    b_t = b_t.balance(&mut s);
+    println!("Perfectly Balanced Tree");
+    b_t.print(0);
 }

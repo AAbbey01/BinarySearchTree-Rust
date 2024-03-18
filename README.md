@@ -18,3 +18,10 @@ b_t.add_node(unsafe_bst::nodes::Node{val: 15});
 b_t.add_node(unsafe_bst::nodes::Node{val: 11});
 print!("{}",b_t.print(0));
 ```
+
+
+
+# Changelog:
+v0.2.1 - fixed balance so that is properly functions
+v0.2.0 - renamed crate to "unsafe-bst"
+v0.1.0 - Created Crate

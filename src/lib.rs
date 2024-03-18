@@ -21,7 +21,7 @@ pub mod nodes{
     ///Module that houses all Binary Tree Operations
     pub mod binary_tree{
         use std::borrow::BorrowMut;
-        use crate::{nodes::{self}, stats::Stats};
+        use crate::{nodes::{self, Node}, stats::Stats};
     #[derive(Debug,Clone)]
     /**A Binary Tree has a root node, and possibly a left and right subtree.
     Option is used to allow the possibility that a left/right subtree is not defined.
@@ -104,7 +104,7 @@ pub mod nodes{
                 let t = unsafe{self.left.as_ref().unwrap_unchecked().print(space)};
                 r = format!("{} {}\n",r,t);
             }
-            return r;
+            return r.trim_end().to_owned();
         }
 
         fn add_next(&mut self, node: nodes::Node){
@@ -129,7 +129,7 @@ pub mod nodes{
         }
         pub fn delete( &mut self, node: i64){
             if !self.find(node){
-                println!("Value not in tree");
+                println!("Value {node} not in tree");
                 return;
             }
             let mut b: &mut BinTree = self; 
@@ -146,7 +146,9 @@ pub mod nodes{
             }
             if b.left.is_none() && b.right.is_none(){b.root.val = -1;}
             //get 
-            if b.left.is_some() && b.right.is_none(){b.success_left();}
+            if b.left.is_some() && b.right.is_none(){
+                b.success_left();
+            }
             if b.left.is_none() && b.right.is_some(){b.success_right();}
             if b.left.is_some() && b.right.is_some(){
                 let c= b.successor().root.val;
@@ -203,17 +205,34 @@ pub mod nodes{
             }
             return b.root.clone();
         }
-        pub fn balance(&mut self, s: Stats){
-            let mut b_b = BinTree{..Default::default()};
-            let mut t:Vec<i64> = Vec::new();
-            for num in s.list{
-                t.push(num);
+        pub fn balance(&mut self, s: &mut Stats) -> BinTree{
+            let mut b_t: BinTree = BinTree{..Default::default()};
+            let mut v = s.list.clone();
+            v.sort();
+            s.list = Vec::new();
+            for num in &v{
+            self.delete(*num);
             }
-            t.sort();
-            for num in t{
-                b_b.add_node(nodes::Node { val: (num) });
-            } 
-            b_b.print(0);
+            //self is empty, and v has all values
+            let a = v.len() as usize;
+            b_t.build(&mut v, 0, a-1,  s);
+            b_t
+        }
+        fn build(&mut self, v: &mut Vec<i64>, start: usize, end: usize, s: &mut Stats){
+            if start>end{
+                return;
+            }
+            let mid:usize = ((start+end)/2).try_into().unwrap();
+            let roo = v[mid];
+            s.list.push(roo);
+            println!("{roo}");
+            self.add_node(Node { val: roo });
+            
+            if mid>0{
+            self.build(v, start, (mid-1).try_into().unwrap(), s);
+        }
+            self.build(v, (mid+1).try_into().unwrap(), end, s);
+            return;
         }
         pub fn add_2(&mut self, node: nodes::Node){
             if node.val == -1 {return;}
@@ -277,6 +296,7 @@ pub mod nodes{
                 println!("# of Nodes: {}",self.count);
             }
             pub fn print_list(&mut self){
+                if self.list.len() == 0{return;}
                 print!("List of Nodes: ");
                 let last = self.list.last().unwrap();
                 for num in &self.list{
