@@ -144,35 +144,48 @@ pub mod nodes{
                 b = unsafe{b.right.as_mut().unwrap_unchecked().borrow_mut()};
                }
             }
+            //Leaf 
             if b.left.is_none() && b.right.is_none(){b.root.val = -1;}
-            //get 
+            //Left Subtree Exists
             if b.left.is_some() && b.right.is_none(){
-                b.success_left();
+               let mut v:Vec<i64> = Vec::new();
+               b.left.as_mut().unwrap().repopulate(&mut v);
+               for n in &v{
+                b.delete(*n);
+               }
+               b.root.val = v.remove(0);
+               for n in v{
+                b.add_node(Node { val: n });
+               }
+               return;
             }
-            if b.left.is_none() && b.right.is_some(){b.success_right();}
+            if b.left.is_none() && b.right.is_some(){
+               let mut v:Vec<i64> = Vec::new();
+               b.right.as_mut().unwrap().repopulate(&mut v);
+               for n in &v{
+                b.delete(*n);
+               }
+               b.root.val = v.remove(0);
+               for n in v{
+                b.add_node(Node { val: n });
+               }
+               return;
+            }
+            
             if b.left.is_some() && b.right.is_some(){
                 let c= b.successor().root.val;
                 //let temp = b.root.val;
                 b.delete(c);
-                b.root.val = c;
+                b.root.val = c; 
             } 
         }
-        pub fn success_left(&mut self){
-           // println!("Yes we moved on, to {}",self.root.val);
-            if self.left.is_some() {
-                self.root.val = unsafe{self.left.as_mut().unwrap_unchecked().root.val};
-                unsafe{self.left.as_mut().unwrap_unchecked().success_left();}
-            }else{
-                self.root.val = -1;
+        fn repopulate(&mut self, v: &mut Vec<i64>){
+            v.push(self.root.val);
+            if self.left.is_some(){
+                self.left.as_mut().unwrap().repopulate(v);
             }
-        }
-        pub fn success_right(&mut self){
-            //println!("Yes we moved on, to {}",self.root.val);
-            if self.right.is_some() {
-                self.root.val = unsafe{self.right.as_mut().unwrap_unchecked().root.val};
-                unsafe{self.right.as_mut().unwrap_unchecked().success_right();}
-            }else{
-                self.root.val = -1;
+            if self.right.is_some(){
+                self.right.as_mut().unwrap().repopulate(v);
             }
         }
         pub fn successor(&mut self) -> &mut BinTree{
@@ -210,9 +223,6 @@ pub mod nodes{
             let mut v = s.list.clone();
             v.sort();
             s.list = Vec::new();
-            for num in &v{
-            self.delete(*num);
-            }
             //self is empty, and v has all values
             let a = v.len() as usize;
             b_t.build(&mut v, 0, a-1,  s);

@@ -112,6 +112,7 @@ fn main(){
                     }
                 };
                 b_t.delete(key);
+                stat_track.remove(key);
             },
             "P" => print!("{}",b_t.print(0)),
             "E" => break,
