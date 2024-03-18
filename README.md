@@ -5,13 +5,12 @@
 
 # Examples
 
-This will print a tree with a root of 13, right value of 15, and left value of 11
-And it will look like this:
-    11
-13
-    15
+This will print a tree with a root of 13, right value of 15, and left value of 11 \
+And it will look like this:\
+    11\
+13\
+    15\
 ```rust
-
 let mut b_t = unsafe_bst::binary_tree::BinTree{..Default::default()};
 b_t.add_node(unsafe_bst::nodes::Node{val: 13});
 b_t.add_node(unsafe_bst::nodes::Node{val: 15});
@@ -22,6 +21,6 @@ print!("{}",b_t.print(0));
 
 
 # Changelog:
-v0.2.1 - fixed balance so that is properly functions
-v0.2.0 - renamed crate to "unsafe-bst"
+v0.2.1 - fixed balance so that is properly functions\
+v0.2.0 - renamed crate to "unsafe-bst"\
 v0.1.0 - Created Crate
