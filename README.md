@@ -9,7 +9,7 @@ This will print a tree with a root of 13, right value of 15, and left value of 1
 And it will look like this:\
     11\
 13\
-    15\
+    15
 ```rust
 let mut b_t = unsafe_bst::binary_tree::BinTree{..Default::default()};
 b_t.add_node(unsafe_bst::nodes::Node{val: 13});
