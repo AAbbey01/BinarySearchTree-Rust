@@ -23,18 +23,14 @@
 #![allow(non_snake_case)]
 use std::{fs::File, io::{self, BufRead, BufReader}};
 static PATH:&str = "src\\user_params.txt";
-//use eframe::egui;
 ///This is a constant variable for spacing when printing the Tree.
 ///Simple module defining the Node structure and its implementations
-
-
 fn main(){
     let mut b_t = unsafe_bst::binary_tree::BinTree{..Default::default()};
     let mut stat_track = unsafe_bst::stats::Stats{..Default::default()};    
     let file:File = File::open(PATH).expect("Reason");
     let reader = BufReader::new(file);
     let lines: Vec<_> = reader.lines().collect();
-    
     loop{
         for l in &lines{
             match l{
@@ -68,7 +64,6 @@ fn main(){
                     }
                     numbers.push(num);
                 }
-                
                 for num in numbers {
                     b_t.add_node(unsafe_bst::nodes::Node{val: num});
                     stat_track.add(num);
@@ -83,7 +78,6 @@ fn main(){
                     io::stdin()
                         .read_line(&mut ing)
                         .expect("Failed to read line");
-
                 let key: i64 = match ing.trim().parse() {
                     Ok(key) => key,
                     Err(_) => {
@@ -103,7 +97,6 @@ fn main(){
                     io::stdin()
                         .read_line(&mut ing)
                         .expect("Failed to read line");
-
                 let key: i64 = match ing.trim().parse() {
                     Ok(key) => key,
                     Err(_) => {
@@ -127,7 +120,6 @@ fn main(){
             "S" => {
                 stat_track.print_count();
                 stat_track.print_list();
-
             },
             "R" => {
                 println!("Enter how many nodes you want:  ");
@@ -135,7 +127,6 @@ fn main(){
                     io::stdin()
                         .read_line(&mut ing)
                         .expect("Failed to read line");
-
                 let key: i64 = match ing.trim().parse() {
                     Ok(key) => key,
                     Err(_) => {
@@ -153,25 +144,15 @@ fn main(){
             }
             _ => print!("Please Input a Valid Arg\n"),
         } //match input statement
-        
-        
     }//inf loop for input
 }
-/*fn pause() {
-
-    print!("Press any key to continue");
-        let mut _pause = String::new();
-            io::stdin()
-                .read_line( &mut pause)
-                .expect("Failed to read line");
-}*/
 fn test_1(mut b_t: unsafe_bst::binary_tree::BinTree){
     let mut stat_t1 = unsafe_bst::stats::Stats{..Default::default()};
     println!("Test values supplied by my friend Grimgar");
     let numbers = vec![87,1,3,58,99,69,70,31,41,59,26,18];
     for num in numbers {
         println!("{num} added to the bst");
-        b_t.add_2(unsafe_bst::nodes::Node{val: num});
+        b_t.add_node(unsafe_bst::nodes::Node{val: num});
         stat_t1.add(num);
     }
     println!("A print of the tree, before Any Tests");

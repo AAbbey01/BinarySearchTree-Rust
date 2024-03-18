@@ -43,7 +43,7 @@ pub mod nodes{
             //! tree.add_node(Node{val:14});
             //! tree.add_node(Node{val:15});
             //! tree.add_node(Node{val:13});
-            //! asserteq!(tree.find(17,false));
+            //! assert_eq!(tree.find(17,false));
             //! assert!(tree.find(14));
             //! ```
             let mut b = false;
@@ -63,7 +63,12 @@ pub mod nodes{
             return b;
         }
         pub fn add_node(&mut self, node: crate::nodes::Node){
-            //print!("Adding to {}\n",self.root.val);
+            //!Add is called by a tree and inputs a Node. The node is added to the tree if it not already in the tree, following basic BST rules
+            //! i.e. smaller values of root are to the left, larger values to the right.
+            //! ```rust
+            //! let mut tree = BinTree{..Default::default()};
+            //! tree.add_node(Node{val:14});
+            //! ```
             if node.val == self.root.val {println!("Node already in tree"); return;}
             if node.val == -1 {return;}
             if self.root.val == -1 {
@@ -87,6 +92,20 @@ pub mod nodes{
             }
         }
         pub fn print(&self, spacing: i64 ) -> String{
+            //!Prints a tree in the following format:
+            //! <pre>
+            //!     left-subtree
+            //! root
+            //!     right-subtree
+            //! </pre>
+            //! spacing should be 0, as 5 spaces are hardcoded into print for each non-root line.
+            //! ```rust
+            //! let mut tree = BinTree{..Default::default()};
+            //! tree.add_node(Node{val:14});
+            //! tree.add_node(Node{val:15});
+            //! tree.add_node(Node{val:13});
+            //! tree.print(0);
+            //! ```
             let mut r:String = String::new();
             let space = spacing + 5;
             if self.root.val == -1 {return r;}
@@ -106,28 +125,19 @@ pub mod nodes{
             }
             return r.trim_end().to_owned();
         }
-
-        fn add_next(&mut self, node: nodes::Node){
-            if node.val == -1 {return;}
-            if self.root.val == -1 {
-                self. root = node;
-                return;
-            }
-            if self.root.val > node.val{
-                if !self.left.is_some(){
-                self.left = Some(Box::new(BinTree{root: node, ..Default::default()}));
-                }else{
-                   unsafe {let _ = &self.left.as_mut().unwrap_unchecked().add_next(node);}
-                }    
-            }else{
-                if !self.right.is_some(){
-                    self.right =  Some(Box::new(BinTree{root: node, ..Default::default()}));
-                }else{
-                    unsafe {let _ = &self.right.as_mut().unwrap_unchecked().add_next(node);}
-                }
-            }
-        }
         pub fn delete( &mut self, node: i64){
+            //!Deletes an inputted value from the tree. Follows BST deletion rules:
+            //! 1. Leaf node (no left/right-subtree): Node is 'deleted' (set to -1)
+            //! 2. Single Child Node (either left or right-subtree): values of tree are shifted up
+            //! 3. Two child nodes (left and right sub-tree): successor() is used to find the best replacement for the deleted node
+            //! ```rust
+            //! let mut tree = BinTree{..Default::default()};
+            //! tree.add_node(Node{val:14});
+            //! tree.add_node(Node{val: 3});
+            //! tree.delete(14);
+            //! //Tree now has root = 3
+            //! tree.print(0);
+            //! ```
             if !self.find(node){
                 println!("Value {node} not in tree");
                 return;
@@ -189,6 +199,14 @@ pub mod nodes{
             }
         }
         pub fn successor(&mut self) -> &mut BinTree{
+            //!Successor returns a BinTree of the next largest value in the tree from the root (of self)
+            //! ```rust
+            //! let mut tree = BinTree{..Default::default()};
+            //! tree.add_node(Node{val:14});
+            //! tree.add_node(Node{val:17});
+            //! tree.add_node(Node{val:15});
+            //! assert_eq!(15,self.successor().root.val);
+            //! ```
             let mut b: &mut BinTree = unsafe{self.right.as_mut().unwrap_unchecked().borrow_mut()};
             while b.root.val != -1 {
                 if b.left.is_none(){break;}
@@ -199,12 +217,15 @@ pub mod nodes{
             return b;
         }
         pub fn shift_left(&mut self) -> &mut BinTree{
+            //!Shift Left returns the left-subtree of a tree
             return unsafe{self.left.as_mut().unwrap_unchecked().borrow_mut()};
         }
         pub fn shift_right(&mut self) -> &mut BinTree{
+            //!Shift Right returns the right-subtree of a tree 
             return unsafe{self.right.as_mut().unwrap_unchecked().borrow_mut()};
         }
         pub fn get_predecessor(&mut self) -> nodes::Node{
+            //!Get Predecessor returns the Node with the next smallest value to root (self)
             let mut b: &mut BinTree = unsafe{self.left.as_mut().unwrap_unchecked().borrow_mut()};
             while b.right.is_some(){
                 b = b.shift_right();
@@ -212,6 +233,7 @@ pub mod nodes{
             return b.root.clone();
         }
         pub fn get_successor(&mut self) -> nodes::Node{
+            //!Get Successor returns the Node with the next largest value to root (self)
             let mut b: &mut BinTree = unsafe{self.right.as_mut().unwrap_unchecked().borrow_mut()};
             while b.left.is_some(){
                 b = b.shift_left();
@@ -219,6 +241,7 @@ pub mod nodes{
             return b.root.clone();
         }
         pub fn balance(&mut self, s: &mut Stats) -> BinTree{
+            //!Balance attempts to make a perfect BST when it can, else it makes a tree with minimum height
             let mut b_t: BinTree = BinTree{..Default::default()};
             let mut v = s.list.clone();
             v.sort();
@@ -244,24 +267,6 @@ pub mod nodes{
             self.build(v, (mid+1).try_into().unwrap(), end, s);
             return;
         }
-        pub fn add_2(&mut self, node: nodes::Node){
-            if node.val == -1 {return;}
-            if self.root.val == -1 {
-                self. root = node;
-                return;
-            }
-            if self.root.val > node.val{
-                match self.left{
-                    Some(_) => {self.left.as_mut().unwrap().add_next(node)},
-                    None => self.left = Some(Box::new(BinTree{root: node, ..Default::default()})),
-                }
-            }else{
-               match self.right{
-                Some(_) => {self.right.as_mut().unwrap().add_next(node)},
-                None => self.right = Some(Box::new(BinTree{root: node, ..Default::default()})),
-               }
-            }
-        }
     }
     #[warn(unconditional_recursion)]
     impl Default for BinTree{
@@ -273,6 +278,7 @@ pub mod nodes{
     ///Module that holds statistics for the BST
     /// #[derive(Debug,Clone)]
     pub mod stats{
+
         #[derive(Debug,Clone)]
         pub struct Stats{
             pub count: i64,
@@ -280,22 +286,29 @@ pub mod nodes{
         }
         impl Stats{
             pub fn add(&mut self, val: i64){
-                self.list.push(val);
-                    self.count +=1;
+                //!Add adds values to a Stats variable if the value is not in it already
+                if self.list.iter().position(|&x| x >= val).is_some(){
+                    self.list.push(val);
+                    self.count +=1;}
             }
-            pub fn add_list(&mut self, mut lis: Vec<i64>) -> bool{
-    
-                self.list.append(&mut lis);
-                if self.list.len() as i64 != self.count + lis.len() as i64 {
+            pub fn add_list(&mut self, lis: Vec<i64>) -> bool{
+                //!Add_list combines two vectors together, returning true if every value was unique to the stats/tree
+                let pre = self.count + lis.len() as i64;
+                for l in &lis{
+                    self.add(*l);
+                    
+                }
+
+                if pre != self.list.len() as i64 {
                     return false;
                 }
-                self.count += lis.len() as i64;
+                
                 return true;
             }
             pub fn remove(&mut self, val: i64) -> bool{
+                //!Removes a value from the list, or returns false
                 let  k = 0;
                 let b = self.list.remove(self.list.iter().position(|&r | r == val).unwrap_or_else(|| k));
-                //self.list.remove(self.list.iter().position(|&r | r == val).unwrap_or_else(b = false)); 
                 if b == val{
                     self.count-=1;
                     return true;
@@ -303,9 +316,11 @@ pub mod nodes{
                 return false;  
             }
             pub fn print_count(&mut self){
+                //!Prints # of nodes have been added correctly
                 println!("# of Nodes: {}",self.count);
             }
             pub fn print_list(&mut self){
+                //!Prints all the node values added correctly
                 if self.list.len() == 0{return;}
                 print!("List of Nodes: ");
                 let last = self.list.last().unwrap();
@@ -315,15 +330,60 @@ pub mod nodes{
                 }
             }
             pub fn print(&mut self){
+                //!Calls print_count() and print_list()
                 self.print_count();
                 self.print_list();
             }
         }
     
-        impl Default for Stats{
-            fn default() -> Self {
-                Stats{count: 0, list: Vec::new()}
+    impl Default for Stats{
+        fn default() -> Self {
+            Stats{count: 0, list: Vec::new()}
+        }
+    }
+}
+pub mod depreciated_functions{
+    /* 
+    impl crate::binary_tree::BinTree{    
+        fn add_next(&mut self, node: crate::nodes::Node){
+            if node.val == -1 {return;}
+            if self.root.val == -1 {
+                self. root = node;
+                return;
+            }
+            if self.root.val > node.val{
+                if !self.left.is_some(){
+                self.left = Some(Box::new(crate::binary_tree::BinTree{root: node, ..Default::default()}));
+                }else{
+                unsafe {let _ = &self.left.as_mut().unwrap_unchecked().add_next(node);}
+                }    
+            }else{
+                if !self.right.is_some(){
+                    self.right =  Some(Box::new(crate::binary_tree::BinTree{root: node, ..Default::default()}));
+                }else{
+                    unsafe {let _ = &self.right.as_mut().unwrap_unchecked().add_next(node);}
+                }
+            }
+        }
+        pub fn add_2(&mut self, node: nodes::Node){
+            if node.val == -1 {return;}
+            if self.root.val == -1 {
+                self. root = node;
+                return;
+            }
+            if self.root.val > node.val{
+                match self.left{
+                    Some(_) => {self.left.as_mut().unwrap().add_2(node)},
+                    None => self.left = Some(Box::new(BinTree{root: node, ..Default::default()})),
+                }
+            }else{
+               match self.right{
+                Some(_) => {self.right.as_mut().unwrap().add_2(node)},
+                None => self.right = Some(Box::new(BinTree{root: node, ..Default::default()})),
+               }
             }
         }
     
     }
+    */
+}
