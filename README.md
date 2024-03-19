@@ -80,6 +80,7 @@ print!("{}",b_t.print(0));
 
 
 # Changelog:
+v0.3.2 - Added height() function in beta
 v0.3.1 - Made delete safer, not 100% safe, added tests to lib.rs\
 v0.3.0 - Started to make code safer: removed unsafe calls in every function other than delete\
 v0.2.2 - Fixed delete (at least, all seen errors)\

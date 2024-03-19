@@ -105,9 +105,9 @@ fn main(){
                     }
                 };
                 b_t.delete(key);
-                stat_track.remove(key);
+                //stat_track.remove(key);
             },
-            "P" => print!("{}",b_t.print(0)),
+            "P" => println!("{}",b_t.print_2(0,1)),
             "E" => break,
             "T1" => {
                 test_1(b_t);
@@ -191,7 +191,7 @@ fn test_2(mut b_t: unsafe_bst::binary_tree::BinTree){
     stats_test2.print_count();
     stats_test2.print_list();
     println!("Tree\\{}",b_t.root.val);
-    stats_test2.remove(b_t.root.val);
+    //stats_test2.remove(b_t.root.val);
     b_t.delete(b_t.root.val);
     println!("{}",b_t.print(0));
     stats_test2.print_count();
@@ -206,8 +206,8 @@ fn test_3(mut b_t: unsafe_bst::binary_tree::BinTree){
         b_t.add_node(unsafe_bst::nodes::Node { val: (n) });
         s.add(n);
     }
-    b_t.print(0);
+    println!("{}",b_t.print_2(0,1));
     b_t = b_t.balance(&mut s);
     println!("Perfectly Balanced Tree");
-    b_t.print(0);
+    println!("{}",b_t.print_2(0,1));
 }

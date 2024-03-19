@@ -94,6 +94,9 @@ pub mod nodes{
                 }      
             }
         }
+        pub fn print_def(&self){
+            println!("{}",self.print_2(0, 1));
+        }
         pub fn print(&self, spacing: i64 ) -> String{
             //!Prints a tree in the following format:
             //! <pre>
@@ -127,6 +130,42 @@ pub mod nodes{
             }
             return r.trim_end().to_owned();
         }
+        pub fn print_2(&self, spacing: i64 ,spacing2:i64) -> String{
+            //!Prints a tree in the following format:
+            //! <pre>
+            //!  left-subtree
+            //! root
+            //!  right-subtree
+            //! </pre>
+            //! takes 2 params, spacing: how many spaces should the root have, and spacing2: how many spaces for each subtree call
+            //! ```rust
+            //! use unsafe_bst::*;
+            //! let mut tree = binary_tree::BinTree{..Default::default()};
+            //! tree.add_node(nodes::Node{val:14});
+            //! tree.add_node(nodes::Node{val:15});
+            //! tree.add_node(nodes::Node{val:13});
+            //! tree.print(0);
+            //! ```
+            let mut r:String = String::new();
+            let space = spacing + spacing2;
+            if self.root.val == -1 {return r;}
+            for _n in spacing2..space{
+                r = format!("{} ",r);
+            }
+            r = format!("{}{}\n",r,self.root.val);
+            
+            if self.left.is_some() && self.left.as_ref().unwrap().root.val != -1{
+                let t = self.left.as_ref().unwrap().print_2(space,spacing2);
+                r = format!("{}{}\n",r,t);
+            }
+            if self.right.is_some() && self.right.as_ref().unwrap().root.val != -1{ 
+                let t = self.right.as_ref().unwrap().print_2(space,spacing2);
+                r = format!("{}{}\n",r,t);
+            }
+            
+            return r.trim_end().to_owned();
+        }
+        
         pub fn delete( &mut self, node: i64){
             //!Deletes an inputted value from the tree. Follows BST deletion rules:
             //! 1. Leaf node (no left/right-subtree): Node is 'deleted' (set to -1)
@@ -254,7 +293,8 @@ pub mod nodes{
             s.list = Vec::new();
             //self is empty, and v has all values
             let a = v.len() as usize;
-            b_t.build(&mut v, 0, a-1,  s);
+            if a > 0{
+            b_t.build(&mut v, 0, a-1,  s);}
             b_t
         }
         fn build(&mut self, v: &mut Vec<i64>, start: usize, end: usize, s: &mut Stats){
@@ -264,7 +304,7 @@ pub mod nodes{
             let mid:usize = ((start+end)/2).try_into().unwrap();
             let roo = v[mid];
             s.list.push(roo);
-            println!("{roo}");
+            //println!("{roo}");
             self.add_node(Node { val: roo });
             
             if mid>0{
@@ -272,6 +312,17 @@ pub mod nodes{
         }
             self.build(v, (mid+1).try_into().unwrap(), end, s);
             return;
+        }
+        pub fn height(&mut self, i: i64, v: &mut Vec<i64>){
+            if self.left.is_some(){
+                self.left.as_mut().unwrap().height(i+1, v);
+
+            }
+            if self.right.is_some(){
+                self.right.as_mut().unwrap().height(i+1, v);
+
+            }
+            v.push(i);
         }
     }
     #[warn(unconditional_recursion)]
@@ -293,9 +344,14 @@ pub mod nodes{
         impl Stats{
             pub fn add(&mut self, val: i64){
                 //!Add adds values to a Stats variable if the value is not in it already
-                if self.list.iter().position(|&x| x >= val).is_some(){
-                    self.list.push(val);
-                    self.count +=1;}
+                match self.list.binary_search(&val){
+                    Ok(_s) => return,
+                    Err(_s) =>{
+                        self.list.push(val);
+                        self.count+=1;
+                    },
+                }
+                
             }
             pub fn add_list(&mut self, lis: Vec<i64>) -> bool{
                 //!Add_list combines two vectors together, returning true if every value was unique to the stats/tree
@@ -449,4 +505,42 @@ fn delete_test(){
     b_t.delete(16);
     println!("b2{}",b_t.print(0));
     assert_eq!(b_t.print(0),b_t2.print(0));
+}
+
+#[test]
+fn print_2_test(){
+    let mut b_t = binary_tree::BinTree{..Default::default()};
+    b_t.add_node(nodes::Node { val: 14 });
+    b_t.add_node(nodes::Node { val: 13 });
+    b_t.add_node(nodes::Node { val: 15 });
+    assert_ne!(b_t.print_2(0, 0),b_t.print_2(0,1));
+}
+
+#[test]
+fn height_test_1(){
+    let mut b_t = binary_tree::BinTree{..Default::default()};
+    b_t.add_node(nodes::Node { val: 14 });
+    b_t.add_node(nodes::Node { val: 13 });
+    b_t.add_node(nodes::Node { val: 12 });
+    let i = 0;
+    let mut v: Vec<i64> = Vec::new();
+    b_t.height(i, &mut v);
+    v.sort();
+   // v.pop().unwrap();
+    assert_eq!(2,v.pop().unwrap());
+}
+#[test]
+fn height_test_2(){
+    let mut b_t = binary_tree::BinTree{..Default::default()};
+    let mut s = stats::Stats {..Default::default()};
+    for n in 1..32{
+        b_t.add_node(nodes::Node { val: n });
+        s.add(n);
+    }
+    b_t = b_t.balance(&mut s);
+    let mut v: Vec<i64> = Vec::new();
+    let i = 0;
+    b_t.height(i, &mut v);
+    v.sort();
+    assert_eq!(4, v.pop().unwrap());
 }
