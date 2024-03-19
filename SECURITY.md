@@ -15,8 +15,7 @@ currently being supported with security updates.
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you find any vulnerability or any issue with my library, feel free to contact  me at aabbey1@binghamton.edu.
+You can also feel free to leave suggestions for the library.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Please use a header like 'unsafe_bst issue: [issue]' or 'unsafe_bst: please add [function].' Remember to provide as much information as possible so that I can understand the issue/idea and implement a fix/a function for it.
