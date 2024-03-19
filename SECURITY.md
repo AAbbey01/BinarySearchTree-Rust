@@ -15,7 +15,7 @@ currently being supported with security updates.
 
 ## Reporting a Vulnerability
 
-If you find any vulnerability or any issue with my library, feel free to contact  me at aabbey1@binghamton.edu.
+If you find any vulnerability or any issue with my library, feel free to contact  me at unsafe.binary.adm@gmail.com.
 You can also feel free to leave suggestions for the library.
 
 Please use a header like 'unsafe_bst issue: [issue]' or 'unsafe_bst: please add [function].' Remember to provide as much information as possible so that I can understand the issue/idea and implement a fix/a function for it.
