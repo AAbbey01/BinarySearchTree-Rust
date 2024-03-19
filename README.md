@@ -40,7 +40,8 @@ root
 for the entire tree. \
 For the best results, spacing should be 0
 ### delete(&self, key: i64)
-Deletes a key from a tree, if the key exists in the tree
+Deletes a key from a tree, if the key exists in the tree\
+Note: Delete uses GOTO functionality to get through the tree (via enum)
 ### balance(&self, s: &mut Stats) -> BinTree
 Returns <span style="color:red">self</span> as a balanced binary tree
 
@@ -79,7 +80,8 @@ print!("{}",b_t.print(0));
 
 
 # Changelog:
-v0.3.0 - Started to make code safer: removed unsafe calls in every function other than delete
+v0.3.1 - Made delete safer, not 100% safe, added tests to lib.rs\
+v0.3.0 - Started to make code safer: removed unsafe calls in every function other than delete\
 v0.2.2 - Fixed delete (at least, all seen errors)\
 v0.2.1 - fixed balance so that is properly functions\
 v0.2.0 - renamed crate to "unsafe-bst"\

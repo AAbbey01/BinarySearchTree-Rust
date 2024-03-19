@@ -184,7 +184,7 @@ fn test_2(mut b_t: unsafe_bst::binary_tree::BinTree){
         b_t.add_node(unsafe_bst::nodes::Node { val: (n) });
         stats_test2.add(n);
     }
-    b_t.print(0);
+    println!("{}",b_t.print(0));
     println!("Root Node: {}", b_t.root.val);
     println!("Root Predecessor: {}",b_t.get_predecessor().val);
     println!("Root Successor: {}", b_t.get_successor().val);
@@ -193,7 +193,7 @@ fn test_2(mut b_t: unsafe_bst::binary_tree::BinTree){
     println!("Tree\\{}",b_t.root.val);
     stats_test2.remove(b_t.root.val);
     b_t.delete(b_t.root.val);
-    b_t.print(0);
+    println!("{}",b_t.print(0));
     stats_test2.print_count();
     stats_test2.print_list();
 }
